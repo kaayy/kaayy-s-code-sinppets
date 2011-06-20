@@ -1,0 +1,79 @@
+% sortingnetwork.tex
+% The sortingnetwork macro defined in this file uses Tikz package to draw a sorting network.
+%
+% written by: kaayy
+% Oct. 10, 2010
+% 
+% Usage:
+% \begin{sortingnetwork}[number of inputs][number of layers][scale]
+% \nodeconnection{{1, 2},{3, 4}, ...}
+% \nodelabel{1, 2, 3, 4, ...}
+% ...
+% \end{sortingnetwork}
+%
+%UPDATE 1: Oct. 15, 2010, requirement for forarray package is eliminated
+%
+% The exemplary sorting network is taken from Figure 27.12 (c), CLRS 2nd Edition
+
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[trim]{tokenizer} 
+
+\makeatletter
+
+\newcounter{sncolumncounter}
+\newcounter{snrowcounter}
+
+\def \nodelabel#1{%
+\setcounter{snrowcounter}{1}
+ \foreach \i in {#1}{%
+   \draw (\value{sncolumncounter},\value{snrowcounter}) node[anchor=south]{\i};
+   \addtocounter{snrowcounter}{1}
+ }
+ \addtocounter{sncolumncounter}{1}
+}
+
+\def \nodeconnection#1{%
+  \foreach \i in {#1}{%
+    \GetTokens{nodesrc}{nodedest}{\i}
+    \draw (\value{sncolumncounter},\nodesrc) node[circle,fill=black]{}--(\value{sncolumncounter},\nodedest) node[circle,fill=black]{};
+  }
+  \addtocounter{sncolumncounter}{1}
+}
+ 
+\newenvironment{sortingnetwork}[3]
+{
+  \setcounter{sncolumncounter}{0}
+  \def \sn@fullsize{15}
+  \begin{tikzpicture}[scale=#3*\sn@fullsize/#2]
+  \foreach \i in {1, ..., #1}
+  {
+    \draw (0,\i)--(#2-1,\i);
+  }
+}
+{
+  \end{tikzpicture}
+}
+\makeatother
+
+\begin{document}
+
+\begin{sortingnetwork}{8}{15}{1}
+\nodelabel{0,0,0,1,0,1,0,1}
+\nodeconnection{{1,2},{3,4},{5,6},{7,8}}
+\nodelabel{0,0,1,0,1,0,1,0}
+\nodeconnection{{1,4},{5,8}}
+\nodeconnection{{2,3},{6,7}}
+\nodeconnection{{1,2},{3,4},{5,6},{7,8}}
+\nodelabel{1,0,0,0,1,1,0,0}
+\nodeconnection{{1,8}}
+\nodeconnection{{2,7}}
+\nodeconnection{{3,6}}
+\nodeconnection{{4,5}}
+\nodeconnection{{2,4},{6,8}}
+\nodeconnection{{1,3},{5,7}}
+\nodeconnection{{1,2},{3,4},{5,6},{7,8}}
+\nodelabel{1,1,1,0,0,0,0,0}
+\end{sortingnetwork}
+
+\end{document}
